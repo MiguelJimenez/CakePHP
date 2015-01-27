@@ -14,7 +14,7 @@ class Mesero extends AppModel
 				'rule' => 'isUnique',
 				'message' => 'El DNI ya se encuentra en nuestra base de datos'
 				),*/
-			),
+		),
 		'nombre' => array(
 			'rule' => 'notEmpty'
 			),
@@ -31,5 +31,19 @@ class Mesero extends AppModel
 				)
 			),
 		);
+public $hasMany = array(
+			'Mesa' => array(
+				'className' => 'Mesa',
+				'foreignKey' => 'mesero_id',
+				'conditions' => '',
+				'order' => 'Mesa.serie DESC',
+				'depend' => false
+			)
+		);
+
 }
+
+
+
+
 ?>
