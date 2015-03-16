@@ -93,6 +93,7 @@ class MediaView extends View {
 		if ($compress) {
 			$this->response->compress();
 		}
+		$this->response->send();
 	}
 
 }

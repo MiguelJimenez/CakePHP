@@ -83,7 +83,7 @@ class TimeHelper extends AppHelper {
  * Magic isset check for deprecated attributes.
  *
  * @param string $name Name of the attribute to check.
- * @return bool|null
+ * @return bool
  */
 	public function __isset($name) {
 		if (isset($this->{$name})) {

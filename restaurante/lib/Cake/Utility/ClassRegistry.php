@@ -181,9 +181,15 @@ class ClassRegistry {
 					} elseif ($plugin && class_exists($plugin . 'AppModel')) {
 						$appModel = $plugin . 'AppModel';
 					}
+					if (!empty($appModel)) {
+						$settings['name'] = $class;
+						$instance = new $appModel($settings);
+					}
 
-					$settings['name'] = $class;
-					$instance = new $appModel($settings);
+					if (!isset($instance)) {
+						trigger_error(__d('cake_dev', '(ClassRegistry::init() could not create instance of %s', $class), E_USER_WARNING);
+						return false;
+					}
 				}
 				$_this->map($alias, $class);
 			}

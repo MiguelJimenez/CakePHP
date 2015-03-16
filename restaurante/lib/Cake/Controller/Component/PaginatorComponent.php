@@ -240,7 +240,8 @@ class PaginatorComponent extends Component {
 			throw new NotFoundException();
 		}
 
-		if (!in_array('Paginator', $this->Controller->helpers) &&
+		if (
+			!in_array('Paginator', $this->Controller->helpers) &&
 			!array_key_exists('Paginator', $this->Controller->helpers)
 		) {
 			$this->Controller->helpers[] = 'Paginator';

@@ -102,8 +102,7 @@ class Mysql extends DboSource {
 	public $tableParameters = array(
 		'charset' => array('value' => 'DEFAULT CHARSET', 'quote' => false, 'join' => '=', 'column' => 'charset'),
 		'collate' => array('value' => 'COLLATE', 'quote' => false, 'join' => '=', 'column' => 'Collation'),
-		'engine' => array('value' => 'ENGINE', 'quote' => false, 'join' => '=', 'column' => 'Engine'),
-		'comment' => array('value' => 'COMMENT', 'quote' => true, 'join' => '=', 'column' => 'Comment'),
+		'engine' => array('value' => 'ENGINE', 'quote' => false, 'join' => '=', 'column' => 'Engine')
 	);
 
 /**
@@ -353,7 +352,7 @@ class Mysql extends DboSource {
 				$fields[$column->Field]['unsigned'] = $this->_unsigned($column->Type);
 			}
 			if ($fields[$column->Field]['type'] === 'timestamp' && strtoupper($column->Default) === 'CURRENT_TIMESTAMP') {
-				$fields[$column->Field]['default'] = null;
+				$fields[$column->Field]['default'] = '';
 			}
 			if (!empty($column->Key) && isset($this->index[$column->Key])) {
 				$fields[$column->Field]['key'] = $this->index[$column->Key];
@@ -564,11 +563,7 @@ class Mysql extends DboSource {
 								if (!isset($col['name'])) {
 									$col['name'] = $field;
 								}
-								$alter = 'CHANGE ' . $this->name($field) . ' ' . $this->buildColumn($col);
-								if (isset($col['after'])) {
-									$alter .= ' AFTER ' . $this->name($col['after']);
-								}
-								$colList[] = $alter;
+								$colList[] = 'CHANGE ' . $this->name($field) . ' ' . $this->buildColumn($col);
 							}
 							break;
 					}
@@ -788,9 +783,6 @@ class Mysql extends DboSource {
 		}
 		if (strpos($col, 'enum') !== false) {
 			return "enum($vals)";
-		}
-		if (strpos($col, 'set') !== false) {
-			return "set($vals)";
 		}
 		return 'text';
 	}

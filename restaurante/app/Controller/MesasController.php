@@ -1,75 +1,109 @@
-<?php 
-class MesasController extends AppController
-{
-	public $helpers = array('Html', 'Form', 'Time');
-	public $components = array('Session');
+<?php
+App::uses('AppController', 'Controller');
+/**
+ * Mesas Controller
+ *
+ * @property Mesa $Mesa
+ * @property PaginatorComponent $Paginator
+ */
+class MesasController extends AppController {
 
-	public function index()
-	{
-		$this->set('mesas', $this->Mesa->find('all'));
+/**
+ * Components
+ *
+ * @var array
+ */
+	public $components = array('Paginator');
+
+/**
+ * index method
+ *
+ * @return void
+ */
+	public function index() {
+		$this->Mesa->recursive = 0;
+		$this->Paginator->settings = array('limit' => 5);
+		$this->set('mesas', $this->Paginator->paginate());
 	}
 
-	public function nuevo()
-	{
-		if($this->request->is('post'))
-		{
+/**
+ * view method
+ *
+ * @throws NotFoundException
+ * @param string $id
+ * @return void
+ */
+	public function view($id = null) {
+		if (!$this->Mesa->exists($id)) {
+			throw new NotFoundException(__('Invalid mesa'));
+		}
+		$options = array('conditions' => array('Mesa.' . $this->Mesa->primaryKey => $id));
+		$this->set('mesa', $this->Mesa->find('first', $options));
+	}
+
+/**
+ * add method
+ *
+ * @return void
+ */
+	public function add() {
+		if ($this->request->is('post')) {
 			$this->Mesa->create();
-			if($this->Mesa->save($this->request->data))
-			{
-				$this->Session->setFlash('La mesa ha sido creada', 'default', array('class' => 'success'));
+			if ($this->Mesa->save($this->request->data)) {
+				$this->Session->setFlash('The mesa has been saved.', 'default', array('class' => 'alert alert-success'));
 				return $this->redirect(array('action' => 'index'));
+			} else {
+				$this->Session->setFlash('The mesa could not be saved. Please, try again.', 'default', array('class' => 'alert alert-danger'));
 			}
-			$this->Session->setFlash("No se pudo crear la mesa");
 		}
-
-		$meseros = $this->Mesa->Mesero->find('list', array('fields' => array('id', 'nombre_completo')));
-		$this->set('meseros', $meseros);
+		$meseros = $this->Mesa->Mesero->find('list');
+		$this->set(compact('meseros'));
 	}
 
-	public function editar($id = null)
-	{
-		if(!$id)
-		{
-			throw new NotFoundException("Datos inválidos");
+/**
+ * edit method
+ *
+ * @throws NotFoundException
+ * @param string $id
+ * @return void
+ */
+	public function edit($id = null) {
+		if (!$this->Mesa->exists($id)) {
+			throw new NotFoundException(__('Invalid mesa'));
 		}
-		$mesa = $this->Mesa->findById($id);
-
-		if(!$mesa)
-		{
-			throw new NotFoundException("La mesa no ha sido encontrada");
-		}
-		if($this->request->is(array('post', 'put')))
-		{
-			$this->Mesa->id = $id;
-			if($this->Mesa->save($this->request->data))
-			{
-				$this->Session->setFlash("La mesa ha sido modificada", $elemen = 'default', $params = array('class' => 'success'));
+		if ($this->request->is(array('post', 'put'))) {
+			if ($this->Mesa->save($this->request->data)) {
+				$this->Session->setFlash('The mesa has been saved.', 'default', array('class' => 'alert alert-success'));
 				return $this->redirect(array('action' => 'index'));
+			} else {
+				$this->Session->setFlash('The mesa could not be saved. Please, try again.', 'default', array('class' => 'alert alert-danger'));
 			}
-			$this->Session->setFlash('El registro no pudo ser modificado');
+		} else {
+			$options = array('conditions' => array('Mesa.' . $this->Mesa->primaryKey => $id));
+			$this->request->data = $this->Mesa->find('first', $options);
 		}
-		if(!$this->request->data)
-		{
-			$this->request->data = $mesa;
-		}
-
-		$meseros = $this->Mesa->Mesero->find('list', array('fields' => array('id', 'nombre_completo')));
-		$this->set('meseros', $meseros);
+		$meseros = $this->Mesa->Mesero->find('list');
+		$this->set(compact('meseros'));
 	}
 
-	public function eliminar($id)
-	{
-		if($this->request->is('get'))
-		{
-			throw new MethodNotAllowedException("INCORRECTO");
-			
+/**
+ * delete method
+ *
+ * @throws NotFoundException
+ * @param string $id
+ * @return void
+ */
+	public function delete($id = null) {
+		$this->Mesa->id = $id;
+		if (!$this->Mesa->exists()) {
+			throw new NotFoundException(__('Invalid mesa'));
 		}
-		if($this->Mesa->delete($id))
-		{
-			$this->Session->setFlash('La mesa ha sido eliminada', $element = 'default', $params = array('class' => 'success'));
-			return $this->redirect(array('action' => 'index'));
+		$this->request->allowMethod('post', 'delete');
+		if ($this->Mesa->delete()) {
+			$this->Session->setFlash('The mesa has been deleted.', 'default', array('class' => 'alert alert-success'));
+		} else {
+			$this->Session->setFlash('The mesa could not be deleted. Please, try again.', 'default', array('class' => 'alert alert-danger'));
 		}
+		return $this->redirect(array('action' => 'index'));
 	}
 }
-
-?>

@@ -378,7 +378,7 @@ class CakeSession {
  */
 	public static function read($name = null) {
 		if (empty($name) && $name !== null) {
-			return null;
+			return false;
 		}
 		if (!self::_hasSession() || !self::start()) {
 			return null;
